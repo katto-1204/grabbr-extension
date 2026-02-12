@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "grabbr",
+  "version": "1.3",
+  "description": "Smartly extracts structured content. The ultimate grabber.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "clipboardWrite"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icons/ICON.svg"
+  },
+  "icons": {
+    "16": "icons/ICON.svg",
+    "48": "icons/ICON.svg",
+    "128": "icons/ICON.svg"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ]
+    }
+  ]
+}
