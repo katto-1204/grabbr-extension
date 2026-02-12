@@ -366,10 +366,11 @@ class Scraper {
           box-shadow: 0 10px 40px rgba(0,0,0,0.4);
           cursor: move;
           position: relative;
-          transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         #ghost-container.minimized {
-          height: 220px;
+          height: 80px;
+          width: 580px;
         }
         .header { 
           padding: 8px 12px; 
