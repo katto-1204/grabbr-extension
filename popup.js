@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const previewSearch = document.getElementById('preview-search');
     const exportCsvBtn = document.getElementById('export-csv-btn');
     const exportMdBtn = document.getElementById('export-md-btn');
+    const exportJsonBtn = document.getElementById('export-json-btn');
     const clearResultsBtn = document.getElementById('clear-results-btn');
     const popGhostBtn = document.getElementById('pop-ghost-btn');
 
@@ -151,6 +152,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             downloadMarkdown(currentData);
+        });
+    }
+
+    if (exportJsonBtn) {
+        exportJsonBtn.addEventListener('click', () => {
+            if (!currentData.length) {
+                updateStatus('Nothing to export', 'error');
+                return;
+            }
+            downloadJSON(currentData);
         });
     }
 
@@ -306,50 +317,72 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function downloadMarkdown(data) {
-        let md = "# grabbr Export\n\n";
+        let md = "# grabbr Export - " + new Date().toLocaleDateString() + "\n\n";
         let qCount = 0;
         data.forEach(item => {
             if (item.type === 'question') {
                 qCount++;
                 if (item.imageDesc) md += `> ${item.imageDesc}\n\n`;
                 const prefix = (optNumbering && optNumbering.checked) ? `${qCount}. ` : '';
-                md += `### ${prefix}${item.question}\n`;
+                md += `## ${prefix}${item.question}\n\n`; // Better header hierarchy
                 if (item.choices && item.choices.length > 0) {
                     item.choices.forEach(choiceObj => {
                         const text = typeof choiceObj === 'string' ? choiceObj : choiceObj.text;
-                        md += `- [ ] ${text}\n`;
+                        const isCorrect = typeof choiceObj === 'object' && choiceObj.isAnswer;
+                        const mark = (isCorrect && optStudy && optStudy.checked) ? " [Correct]" : "";
+                        md += `- [ ] ${text}${mark}\n`;
                     });
                 }
-                md += '\n';
+                md += '\n---\n\n';
+            } else if (item.type === 'header') {
+                md += `\n# ${item.text}\n\n`;
             } else {
                 if (item.imageDesc) md += `> ${item.imageDesc}\n\n`;
                 md += `${item.text}\n\n`;
             }
         });
         const link = document.createElement("a");
-        link.setAttribute("href", 'data:text/markdown;charset=utf-8,' + encodeURIComponent(md));
-        link.setAttribute("download", `grabbr_notes_${Date.now()}.md`);
+        const blob = new Blob([md], { type: 'text/markdown' });
+        link.href = URL.createObjectURL(blob);
+        link.download = `grabbr_notes_${Date.now()}.md`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         updateStatus('Markdown Exported', 'success');
     }
 
+    function downloadJSON(data) {
+        const json = JSON.stringify(data, null, 2);
+        const link = document.createElement("a");
+        const blob = new Blob([json], { type: 'application/json' });
+        link.href = URL.createObjectURL(blob);
+        link.download = `grabbr_data_${Date.now()}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        updateStatus('JSON Exported', 'success');
+    }
+
     function downloadCSV(data) {
-        let csvContent = "data:text/csv;charset=utf-8,Type,Question,Content/Choices\n";
+        // RFC 4180 compliant CSV generator
+        const escape = (str) => `"${(str || '').toString().replace(/"/g, '""')}"`;
+
+        let csvContent = "Type,Question,Content/Choices\n";
         data.forEach(item => {
             if (item.type === 'question') {
-                const choices = (item.choices || []).map(c => typeof c === 'string' ? c : c.text).join(' | ').replace(/"/g, '""');
-                const row = `"question","${(item.question || '').replace(/"/g, '""')}","${choices}"`;
-                csvContent += row + "\n";
+                const choices = (item.choices || [])
+                    .map(c => typeof c === 'string' ? c : c.text)
+                    .join(' | ');
+                csvContent += `${escape('question')},${escape(item.question)},${escape(choices)}\n`;
             } else {
-                const row = `"${item.type}","","${(item.text || '').replace(/"/g, '""')}"`;
-                csvContent += row + "\n";
+                csvContent += `${escape(item.type)},${escape('')},${escape(item.text)}\n`;
             }
         });
+
         const link = document.createElement("a");
-        link.setAttribute("href", encodeURI(csvContent));
-        link.setAttribute("download", `grabbr_export_${Date.now()}.csv`);
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
+        link.href = URL.createObjectURL(blob);
+        link.download = `grabbr_export_${Date.now()}.csv`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

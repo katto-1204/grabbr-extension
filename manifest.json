@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "grabbr",
-  "version": "1.3",
+  "version": "1.5",
   "description": "Smartly extracts structured content. The ultimate grabber.",
   "permissions": [
     "activeTab",
@@ -24,6 +24,19 @@
       ],
       "js": [
         "content.js"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "popup.html",
+        "popup.css",
+        "popup.js",
+        "icons/ICON.svg"
+      ],
+      "matches": [
+        "<all_urls>"
       ]
     }
   ]
