@@ -276,20 +276,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
 
-                const previewTab = document.querySelector('[data-tab="preview"]');
-                if (previewTab) previewTab.click();
+                if (previewTab && !document.body.classList.contains('mini-bar-mode')) {
+                    previewTab.click();
+                }
                 updateStatus('Scan complete', 'success');
 
-                // Mini-Bar Feedback
+                // Mini-Bar specific behavior: Always auto-copy so user can "just paste"
                 if (document.body.classList.contains('mini-bar-mode')) {
-                    const originalContent = scanBtn.innerHTML;
-                    scanBtn.innerHTML = `
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        Done Scan
-                    `;
-                    setTimeout(() => {
-                        scanBtn.innerHTML = originalContent;
-                    }, 2000);
+                    const textResponse = await triggerExtraction(false);
+                    if (textResponse && textResponse.data) {
+                        await copyTextToClipboard(textResponse.data, scanBtn);
+
+                        // "Done Scan" feedback replaces "Copied!" for the Mini-Bar vibe
+                        const originalHTML = scanBtn.innerHTML;
+                        scanBtn.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Done Scan
+                        `;
+                        setTimeout(() => { scanBtn.innerHTML = originalHTML; }, 2000);
+                    }
                 }
             }
         });
