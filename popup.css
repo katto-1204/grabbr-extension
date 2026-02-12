@@ -58,10 +58,15 @@ body.light {
   margin-top: 0.5rem;
 }
 
+html {
+  background: transparent;
+}
+
 body {
   margin: 0;
   width: 360px;
-  background-color: var(--background);
+  background-color: transparent;
+  /* Needed for Ghost Mode */
   color: var(--foreground);
   font-family: 'Inter', sans-serif;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
@@ -85,18 +90,16 @@ body {
 }
 
 /* Transparency Mode (Dark Frosted Glass) */
-/* Ultra-Transparency Mode (Ghost Overlay) */
-body.transparent-mode {
-  background-color: rgba(9, 9, 11, 0.15);
-  /* Really transparent */
+/* Ghost/Transparent Mode */
+body.transparent-mode .app-container {
+  background-color: rgba(9, 9, 11, 0.15) !important;
   backdrop-filter: blur(4px) saturate(120%);
-  /* Minimal blur */
   border: 1px solid rgba(255, 255, 255, 0.05);
   box-shadow: none;
 }
 
-body.light.transparent-mode {
-  background-color: rgba(255, 255, 255, 0.15);
+body.light.transparent-mode .app-container {
+  background-color: rgba(255, 255, 255, 0.15) !important;
   backdrop-filter: blur(4px) saturate(120%);
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
@@ -148,6 +151,10 @@ body.transparent-mode .muted-foreground {
   flex-direction: column;
   height: 580px;
   box-sizing: border-box;
+  background-color: var(--background);
+  /* Move background here */
+  border: 1px solid var(--border);
+  transition: background-color 0.3s ease;
 }
 
 /* Header */
