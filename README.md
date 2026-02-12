@@ -20,7 +20,7 @@
 
 ### Visual Immersion
 - **Adaptive UI**: Matches the host page's brightness—automatically switching between Zinc Light and Dark themes.
-- **Ultra-Transparency (Ghost Mode)**: A 15% opacity overlay allows you to see the source page perfectly through the extension for a truly immersive scanning experience.
+- **True Ghost Mode (Floating UI)**: Bypasses Chrome popup window limitations by injecting the UI directly into the webpage. This allows for a genuine 15% opacity floating overlay that you can drag and move anywhere on your screen.
 - **Glassmorphic Design**: Built with high-fidelity blurs, subtle borders, and a clean typography palette inspired by Shadcn/UI.
 
 ### Power-User Workflow
@@ -31,13 +31,25 @@
 
 ---
 
-## Installation
+## Installation Guide
 
-1.  Clone this repository or download the source.
-2.  Open Chrome and navigate to `chrome://extensions`.
-3.  Enable **Developer mode** (top right).
-4.  Click **Load unpacked** and select the extension folder.
-5.  Pin **grabbr** to your toolbar for instant access.
+### 1. Download the Source
+Clone the repository to your local machine:
+```bash
+git clone https://github.com/katto-1204/grabbr-extension.git
+```
+*Alternatively, download the Zip file from the "Code" button and extract it.*
+
+### 2. Load into Chrome
+1.  Open your Chrome browser and navigate to `chrome://extensions`.
+2.  In the top right corner, toggle **Developer mode** to ON.
+3.  Click the **Load unpacked** button that appears.
+4.  Select the `smart-copier` folder (inside the project directory).
+
+### 3. Pin for Quick Access
+1.  Click the **Puzzle piece icon** (Extensions) in your Chrome toolbar.
+2.  Find **grabbr** and click the **Pin icon**.
+3.  Click the **grabbr icon** anytime to start grabbing content!
 
 ---
 
