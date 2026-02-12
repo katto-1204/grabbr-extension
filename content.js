@@ -366,6 +366,10 @@ class Scraper {
           box-shadow: 0 10px 40px rgba(0,0,0,0.4);
           cursor: move;
           position: relative;
+          transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #ghost-container.minimized {
+          height: 220px;
         }
         .header { 
           padding: 8px 12px; 
@@ -375,10 +379,11 @@ class Scraper {
           background: rgba(0,0,0,0.3);
           border-bottom: 1px solid rgba(255,255,255,0.05); 
         }
-        .content { flex: 1; display: flex; position: relative; }
+        .header-btns { display: flex; gap: 8px; align-items: center; }
+        .content { flex: 1; display: flex; position: relative; overflow: hidden; }
         iframe { border: none; width: 100%; height: 100%; pointer-events: auto; }
         .drag-handle { position: absolute; top: 0; left: 0; right: 0; height: 35px; z-index: 10; cursor: move; }
-        #close-ghost { 
+        .win-btn { 
           background: rgba(255,255,255,0.1); 
           border: none; 
           color: white; 
@@ -391,13 +396,18 @@ class Scraper {
           justify-content: center;
           font-size: 14px;
           z-index: 20;
+          transition: background 0.2s;
         }
+        .win-btn:hover { background: rgba(255,255,255,0.2); }
         #close-ghost:hover { background: rgba(255,0,0,0.5); }
       </style>
       <div class="drag-handle"></div>
       <div class="header">
         <span style="font-size: 11px; font-weight: 700; opacity: 0.8; letter-spacing: 0.05em; text-transform: uppercase;">grabbr ghost</span>
-        <button id="close-ghost">✕</button>
+        <div class="header-btns">
+          <button id="min-max-ghost" class="win-btn" title="Minimize/Maximize">−/□</button>
+          <button id="close-ghost" class="win-btn">✕</button>
+        </div>
       </div>
       <div class="content">
         <iframe src="${chrome.runtime.getURL('popup.html')}?ghost=true"></iframe>
@@ -409,6 +419,10 @@ class Scraper {
 
     this.makeDraggable(container, root, shadow.querySelector('.drag-handle'));
     shadow.getElementById('close-ghost').onclick = () => this.removeGhostUI();
+
+    shadow.getElementById('min-max-ghost').onclick = () => {
+      container.classList.toggle('minimized');
+    };
   }
 
   removeGhostUI() {
