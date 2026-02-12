@@ -435,34 +435,51 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        try {
-            await navigator.clipboard.writeText(text);
-            updateStatus('Copied!', 'success');
-
+        const finalizeFeedback = (success) => {
+            updateStatus(success ? 'Copied!' : 'Failed to copy', success ? 'success' : 'error');
             if (btnElement) {
                 const originalHTML = btnElement.innerHTML;
                 const originalWidth = btnElement.offsetWidth;
-                btnElement.style.minWidth = `${originalWidth}px`; // Prevent jump
+                btnElement.style.minWidth = `${originalWidth}px`;
 
-                btnElement.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    Copied!
-                `;
+                btnElement.innerHTML = success ?
+                    `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Copied!` :
+                    `Error!`;
 
                 setTimeout(() => {
                     btnElement.innerHTML = originalHTML;
                     btnElement.style.minWidth = '';
                 }, 2000);
             }
-        } catch (err) {
-            console.error('Clipboard failed:', err);
-            updateStatus('Failed to copy', 'error');
+        };
 
-            if (btnElement) {
-                const originalHTML = btnElement.innerHTML;
-                btnElement.innerHTML = `Error!`;
-                setTimeout(() => { btnElement.innerHTML = originalHTML; }, 2000);
+        // Method 1: Modern Clipboard API
+        try {
+            if (navigator.clipboard) {
+                await navigator.clipboard.writeText(text);
+                finalizeFeedback(true);
+                return;
             }
+        } catch (err) {
+            console.warn('Clipboard API failed, trying fallback...');
+        }
+
+        // Method 2: Legacy Fallback (Reliable for iFrames/Ghost Mode)
+        try {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-9999px";
+            textArea.style.top = "0";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            const success = document.execCommand('copy');
+            document.body.removeChild(textArea);
+            finalizeFeedback(success);
+        } catch (err) {
+            console.error('All copy methods failed:', err);
+            finalizeFeedback(false);
         }
     }
 
