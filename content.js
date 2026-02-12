@@ -68,10 +68,14 @@ class Scraper {
         currentGroup = {
           type: 'question',
           question: el.text,
-          choices: []
+          choices: [],
+          imageDesc: el.imageDesc
         };
       } else if (el.type === 'choice' && currentGroup) {
-        currentGroup.choices.push(el.text);
+        currentGroup.choices.push({
+          text: el.text,
+          isAnswer: el.isAnswer
+        });
       } else {
         if (currentGroup) {
           grouped.push(currentGroup);

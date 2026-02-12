@@ -151,9 +151,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (optNumbering) {
         optNumbering.addEventListener('change', () => {
-            // Re-trigger extraction if they want to toggle numbering on existing data
-            // For now, just a notification
-            updateStatus('Numbering preference updated');
+            renderPreview(currentData);
+            updateStatus('Numbering updated');
         });
     }
 
@@ -270,11 +269,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (item.choices && item.choices.length > 0) {
                     output += `Choices:\n`;
-                    item.choices.forEach(c => {
-                        const isThisAnswer = item.isAnswer || false; // Simple heuristic for now
-                        // Study Mode logic: Only show [✓] if Study Mode is ON
-                        const mark = (isThisAnswer && optStudy && optStudy.checked) ? ' [✓ Correct?]' : '';
-                        output += `   ${c}${mark}\n`;
+                    item.choices.forEach(choiceObj => {
+                        // choices are now {text, isAnswer}
+                        const text = typeof choiceObj === 'string' ? choiceObj : choiceObj.text;
+                        const isCorrect = typeof choiceObj === 'object' && choiceObj.isAnswer;
+
+                        // Study Mode logic: Only show mark if Study Mode is ON
+                        const mark = (isCorrect && optStudy && optStudy.checked) ? ' [✓ Correct?]' : '';
+                        output += `   ${text}${mark}\n`;
                     });
                 }
             } else {
@@ -302,8 +304,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const prefix = (optNumbering && optNumbering.checked) ? `${qCount}. ` : '';
                 md += `### ${prefix}${item.question}\n`;
                 if (item.choices && item.choices.length > 0) {
-                    item.choices.forEach(c => {
-                        md += `- [ ] ${c}\n`;
+                    item.choices.forEach(choiceObj => {
+                        const text = typeof choiceObj === 'string' ? choiceObj : choiceObj.text;
+                        md += `- [ ] ${text}\n`;
                     });
                 }
                 md += '\n';
@@ -325,7 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let csvContent = "data:text/csv;charset=utf-8,Type,Question,Content/Choices\n";
         data.forEach(item => {
             if (item.type === 'question') {
-                const choices = (item.choices || []).join(' | ').replace(/"/g, '""');
+                const choices = (item.choices || []).map(c => typeof c === 'string' ? c : c.text).join(' | ').replace(/"/g, '""');
                 const row = `"question","${(item.question || '').replace(/"/g, '""')}","${choices}"`;
                 csvContent += row + "\n";
             } else {
