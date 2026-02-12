@@ -199,14 +199,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (optTransparency) {
-        optTransparency.addEventListener('change', (e) => {
+        optTransparency.addEventListener('change', async (e) => {
             const isChecked = e.target.checked;
+            localStorage.setItem('grabbr_transparent', isChecked ? 'true' : 'false');
+
+            const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+            if (!tab || !tab.id) return;
+
             if (isChecked) {
-                document.body.classList.add('transparent-mode');
-                localStorage.setItem('grabbr_transparent', 'true');
+                // Automatically Pop Out into Ghost Mode for TRUE transparency
+                await chrome.tabs.sendMessage(tab.id, { action: 'toggleGhostMode', enabled: true });
+                if (!isGhostMode) window.close(); // Only close real popup
             } else {
                 document.body.classList.remove('transparent-mode');
-                localStorage.setItem('grabbr_transparent', 'false');
+                // If we are currently in Ghost Mode and user turns it off, remove the ghost
+                if (isGhostMode) {
+                    await chrome.tabs.sendMessage(tab.id, { action: 'toggleGhostMode', enabled: false });
+                }
             }
         });
     }
