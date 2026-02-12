@@ -48,7 +48,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.ghost-hidden').forEach(el => el.style.display = 'none');
         // Compact height for Ghost iframe
         const app = document.getElementById('app');
-        if (app) app.style.height = '100vh';
+        if (app) {
+            app.style.height = '100vh';
+            app.style.minHeight = '100vh';
+        }
     }
 
     // Auto-Theme Detection
@@ -129,7 +132,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const filtered = currentData.filter(item => {
                 const textMatch = (item.text || '').toLowerCase().includes(query);
                 const questionMatch = (item.question || '').toLowerCase().includes(query);
-                const choicesMatch = (item.choices || []).some(c => c.toLowerCase().includes(query));
+                const choicesMatch = (item.choices || []).some(choiceObj => {
+                    const text = typeof choiceObj === 'string' ? choiceObj : choiceObj.text;
+                    return text.toLowerCase().includes(query);
+                });
                 return textMatch || questionMatch || choicesMatch;
             });
             renderPreview(filtered);
@@ -138,10 +144,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (popGhostBtn) {
         popGhostBtn.addEventListener('click', async () => {
-            const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-            if (!tab || !tab.id) return;
-            await chrome.tabs.sendMessage(tab.id, { action: 'toggleGhostMode', enabled: true });
-            window.close(); // Close the popup window
+            try {
+                const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+                if (!tab || !tab.id) return;
+                await chrome.tabs.sendMessage(tab.id, { action: 'toggleGhostMode', enabled: true });
+                window.close();
+            } catch (err) {
+                updateStatus('Reload page first', 'error');
+            }
         });
     }
 
@@ -292,11 +302,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (item.choices && item.choices.length > 0) {
                     output += `Choices:\n`;
                     item.choices.forEach(choiceObj => {
-                        // choices are now {text, isAnswer}
                         const text = typeof choiceObj === 'string' ? choiceObj : choiceObj.text;
                         const isCorrect = typeof choiceObj === 'object' && choiceObj.isAnswer;
-
-                        // Study Mode logic: Only show mark if Study Mode is ON
                         const mark = (isCorrect && optStudy && optStudy.checked) ? ' [✓ Correct?]' : '';
                         output += `   ${text}${mark}\n`;
                     });
@@ -324,7 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 qCount++;
                 if (item.imageDesc) md += `> ${item.imageDesc}\n\n`;
                 const prefix = (optNumbering && optNumbering.checked) ? `${qCount}. ` : '';
-                md += `## ${prefix}${item.question}\n\n`; // Better header hierarchy
+                md += `## ${prefix}${item.question}\n\n`;
                 if (item.choices && item.choices.length > 0) {
                     item.choices.forEach(choiceObj => {
                         const text = typeof choiceObj === 'string' ? choiceObj : choiceObj.text;
@@ -364,9 +371,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function downloadCSV(data) {
-        // RFC 4180 compliant CSV generator
         const escape = (str) => `"${(str || '').toString().replace(/"/g, '""')}"`;
-
         let csvContent = "Type,Question,Content/Choices\n";
         data.forEach(item => {
             if (item.type === 'question') {
@@ -378,7 +383,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 csvContent += `${escape(item.type)},${escape('')},${escape(item.text)}\n`;
             }
         });
-
         const link = document.createElement("a");
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
         link.href = URL.createObjectURL(blob);
