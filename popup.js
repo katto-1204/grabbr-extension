@@ -276,8 +276,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
 
-                if (previewTab && !document.body.classList.contains('mini-bar-mode')) {
-                    previewTab.click();
+                const previewTabBtn = document.querySelector('[data-tab="preview"]');
+                if (previewTabBtn && !document.body.classList.contains('mini-bar-mode')) {
+                    previewTabBtn.click();
                 }
                 updateStatus('Scan complete', 'success');
 
