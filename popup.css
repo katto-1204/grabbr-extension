@@ -85,8 +85,10 @@ body {
   display: flex;
   flex-direction: column;
   height: 580px;
-  /* Restored height for breathing room */
   box-sizing: border-box;
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  transition: background-color 0.3s ease;
 }
 
 /* Transparency Mode (Dark Frosted Glass) */
@@ -179,92 +181,80 @@ body.transparent-mode .switch::after {
   background: rgba(255, 255, 255, 0.6) !important;
 }
 
-/* Mini-Bar Layout for Ghost Mode Minimized state (height <= 100px) */
-@media (max-height: 100px) {
-  body {
-    width: 100% !important;
-  }
-
-  .app-container {
-    height: 100vh !important;
-    min-height: 100vh !important;
-    border: none !important;
-  }
-
-  .tabs-list,
-  .card-header,
-  .options-panel,
-  .footer,
-  #status-bar,
-  .ghost-hidden {
-    display: none !important;
-  }
-
-  .content-area {
-    padding: 0 10px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    overflow: hidden !important;
-    height: 100% !important;
-  }
-
-  #view-extract {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 12px !important;
-    height: 100% !important;
-    width: 100% !important;
-  }
-
-  .card {
-    border: none !important;
-    background: transparent !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    box-shadow: none !important;
-    backdrop-filter: none !important;
-  }
-
-  .card-content {
-    padding: 0 !important;
-  }
-
-  .custom-select {
-    width: 200px !important;
-  }
-
-  .select-trigger {
-    padding: 4px 10px !important;
-    font-size: 12px !important;
-    background: rgba(255, 255, 255, 0.05) !important;
-  }
-
-  .action-buttons {
-    margin: 0 !important;
-    gap: 8px !important;
-    flex: 1 !important;
-  }
-
-  .action-buttons .btn {
-    padding: 4px 12px !important;
-    font-size: 12px !important;
-    white-space: nowrap !important;
-    height: 32px !important;
-  }
+/* Mini-Bar Layout for Ghost Mode Minimized state */
+body.mini-bar-mode {
+  width: 100% !important;
 }
 
-.app-container {
-  display: flex;
-  flex-direction: column;
-  height: 580px;
-  box-sizing: border-box;
-  background-color: var(--background);
-  /* Move background here */
-  border: 1px solid var(--border);
-  transition: background-color 0.3s ease;
+body.mini-bar-mode .app-container {
+  height: 100vh !important;
+  min-height: 100vh !important;
+  border: none !important;
 }
+
+body.mini-bar-mode .tabs-list,
+body.mini-bar-mode .card-header,
+body.mini-bar-mode .options-panel,
+body.mini-bar-mode .footer,
+body.mini-bar-mode #status-bar,
+body.mini-bar-mode .ghost-hidden {
+  display: none !important;
+}
+
+body.mini-bar-mode .content-area {
+  padding: 0 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  height: 100% !important;
+}
+
+body.mini-bar-mode #view-extract {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 12px !important;
+  height: 100% !important;
+  width: 100% !important;
+}
+
+body.mini-bar-mode .card {
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+body.mini-bar-mode .card-content {
+  padding: 0 !important;
+}
+
+body.mini-bar-mode .custom-select {
+  width: 200px !important;
+}
+
+body.mini-bar-mode .select-trigger {
+  padding: 4px 10px !important;
+  font-size: 12px !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+body.mini-bar-mode .action-buttons {
+  margin: 0 !important;
+  gap: 8px !important;
+  flex: 1 !important;
+}
+
+body.mini-bar-mode .action-buttons .btn {
+  padding: 4px 12px !important;
+  font-size: 12px !important;
+  white-space: nowrap !important;
+  height: 32px !important;
+}
+
 
 /* Header */
 .header {

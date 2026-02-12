@@ -54,6 +54,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Mini-Bar Mode Detection
+    const checkMiniBar = () => {
+        if (window.innerHeight < 100) {
+            document.body.classList.add('mini-bar-mode');
+        } else {
+            document.body.classList.remove('mini-bar-mode');
+        }
+    };
+    window.addEventListener('resize', checkMiniBar);
+    checkMiniBar();
+
     // Auto-Theme Detection
     initTheme();
 
