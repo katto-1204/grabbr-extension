@@ -304,19 +304,17 @@ document.addEventListener('DOMContentLoaded', () => {
         copyBtn.addEventListener('click', async () => {
             updateStatus('Extracting...', 'loading');
             const response = await triggerExtraction(false);
-            if (response && response.data) {
-                await copyTextToClipboard(response.data, copyBtn);
+            if (response) {
+                await copyTextToClipboard(response.data || '', copyBtn);
+            } else {
+                updateStatus('Extraction failed', 'error');
             }
         });
     }
 
     if (copyPreviewBtn) {
         copyPreviewBtn.addEventListener('click', async () => {
-            if (previewBox && previewBox.value) {
-                await copyTextToClipboard(previewBox.value, copyPreviewBtn);
-            } else {
-                updateStatus('Nothing to copy', 'error');
-            }
+            await copyTextToClipboard(previewBox ? previewBox.value : '', copyPreviewBtn);
         });
     }
 
@@ -431,14 +429,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function copyTextToClipboard(text, btnElement) {
+        if (!text && text !== '') {
+            updateStatus('Nothing to copy', 'error');
+            return;
+        }
+
         try {
             await navigator.clipboard.writeText(text);
             updateStatus('Copied!', 'success');
-            const originalHTML = btnElement.innerHTML;
-            btnElement.innerHTML = `✓ Copied!`;
-            setTimeout(() => { btnElement.innerHTML = originalHTML; }, 2000);
+
+            if (btnElement) {
+                const originalHTML = btnElement.innerHTML;
+                const originalWidth = btnElement.offsetWidth;
+                btnElement.style.minWidth = `${originalWidth}px`; // Prevent jump
+
+                btnElement.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    Copied!
+                `;
+
+                setTimeout(() => {
+                    btnElement.innerHTML = originalHTML;
+                    btnElement.style.minWidth = '';
+                }, 2000);
+            }
         } catch (err) {
+            console.error('Clipboard failed:', err);
             updateStatus('Failed to copy', 'error');
+
+            if (btnElement) {
+                const originalHTML = btnElement.innerHTML;
+                btnElement.innerHTML = `Error!`;
+                setTimeout(() => { btnElement.innerHTML = originalHTML; }, 2000);
+            }
         }
     }
 
