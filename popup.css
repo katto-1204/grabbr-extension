@@ -197,6 +197,7 @@ body.mini-bar-mode .card-header,
 body.mini-bar-mode .options-panel,
 body.mini-bar-mode .footer,
 body.mini-bar-mode #status-bar,
+body.mini-bar-mode .search-container,
 body.mini-bar-mode .ghost-hidden {
   display: none !important;
 }
