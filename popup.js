@@ -54,9 +54,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Mini-Bar Mode Detection
+    // Mini-Bar Mode Detection (Only allowed in Ghost/Transparency window)
     const checkMiniBar = () => {
-        if (window.innerHeight < 100) {
+        if (isGhostMode && window.innerHeight < 100) {
             document.body.classList.add('mini-bar-mode');
         } else {
             document.body.classList.remove('mini-bar-mode');
