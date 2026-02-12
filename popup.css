@@ -111,9 +111,24 @@ body.transparent-mode .header {
 
 body.transparent-mode .header h1,
 body.transparent-mode .card-title,
-body.transparent-mode label {
-  color: rgba(255, 255, 255, 0.7);
-  /* Greyer text */
+body.transparent-mode label,
+body.transparent-mode .badge,
+body.transparent-mode .tab-trigger {
+  color: rgba(255, 255, 255, 0.6) !important;
+  /* Muted Grey */
+}
+
+body.transparent-mode .btn {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(8px);
+  box-shadow: none !important;
+}
+
+body.transparent-mode .btn:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
 }
 
 body.transparent-mode .card,
@@ -142,16 +157,26 @@ body.transparent-mode .footer {
 }
 
 body.transparent-mode .tab-trigger.active {
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
 body.transparent-mode .tab-trigger {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.4) !important;
 }
 
-body.transparent-mode .muted-foreground {
-  color: rgba(255, 255, 255, 0.4);
+body.transparent-mode .muted-foreground,
+body.transparent-mode .status-bar {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+body.transparent-mode .switch {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.transparent-mode .switch::after {
+  background: rgba(255, 255, 255, 0.6) !important;
 }
 
 /* Mini-Bar Layout for Ghost Mode Minimized state (height <= 100px) */
