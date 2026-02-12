@@ -334,10 +334,133 @@ class Scraper {
 
     return output.trim();
   }
+
+  injectGhostUI() {
+    if (document.getElementById('grabbr-ghost-root')) return;
+
+    const root = document.createElement('div');
+    root.id = 'grabbr-ghost-root';
+    root.style.position = 'fixed';
+    root.style.top = '20px';
+    root.style.right = '20px';
+    root.style.zIndex = '2147483647';
+
+    const shadow = root.attachShadow({ mode: 'open' });
+
+    const container = document.createElement('div');
+    container.id = 'ghost-container';
+    container.innerHTML = `
+      <style>
+        #ghost-container {
+          width: 380px;
+          height: 600px;
+          background: rgba(9, 9, 11, 0.15);
+          backdrop-filter: blur(8px) saturate(120%);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 12px;
+          color: white;
+          font-family: sans-serif;
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+          box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+          cursor: move;
+          position: relative;
+        }
+        .header { 
+          padding: 8px 12px; 
+          display: flex; 
+          justify-content: space-between; 
+          align-items: center; 
+          background: rgba(0,0,0,0.3);
+          border-bottom: 1px solid rgba(255,255,255,0.05); 
+        }
+        .content { flex: 1; display: flex; position: relative; }
+        iframe { border: none; width: 100%; height: 100%; pointer-events: auto; }
+        .drag-handle { position: absolute; top: 0; left: 0; right: 0; height: 35px; z-index: 10; cursor: move; }
+        #close-ghost { 
+          background: rgba(255,255,255,0.1); 
+          border: none; 
+          color: white; 
+          cursor: pointer; 
+          width: 24px; 
+          height: 24px; 
+          border-radius: 4px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 14px;
+          z-index: 20;
+        }
+        #close-ghost:hover { background: rgba(255,0,0,0.5); }
+      </style>
+      <div class="drag-handle"></div>
+      <div class="header">
+        <span style="font-size: 11px; font-weight: 700; opacity: 0.8; letter-spacing: 0.05em; text-transform: uppercase;">grabbr ghost</span>
+        <button id="close-ghost">✕</button>
+      </div>
+      <div class="content">
+        <iframe src="${chrome.runtime.getURL('popup.html')}?ghost=true"></iframe>
+      </div>
+    `;
+
+    shadow.appendChild(container);
+    document.body.appendChild(root);
+
+    this.makeDraggable(container, root, shadow.querySelector('.drag-handle'));
+    shadow.getElementById('close-ghost').onclick = () => this.removeGhostUI();
+  }
+
+  removeGhostUI() {
+    const el = document.getElementById('grabbr-ghost-root');
+    if (el) el.remove();
+  }
+
+  makeDraggable(container, root, handle) {
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    handle.onmousedown = dragMouseDown;
+
+    function dragMouseDown(e) {
+      e = e || window.event;
+      e.preventDefault();
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      document.onmouseup = closeDragElement;
+      document.onmousemove = elementDrag;
+    }
+
+    function elementDrag(e) {
+      e = e || window.event;
+      e.preventDefault();
+      pos1 = pos3 - e.clientX;
+      pos2 = pos4 - e.clientY;
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      root.style.top = (root.offsetTop - pos2) + "px";
+      root.style.left = (root.offsetLeft - pos1) + "px";
+      root.style.right = 'auto';
+    }
+
+    function closeDragElement() {
+      document.onmouseup = null;
+      document.onmousemove = null;
+    }
+  }
 }
 
 // Updated Listener for Async
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'toggleGhostMode') {
+    const scraper = new Scraper();
+    if (request.enabled) {
+      scraper.injectGhostUI();
+    } else {
+      scraper.removeGhostUI();
+    }
+    sendResponse({ success: true });
+    return true;
+  }
+
   if (request.action === 'extract') {
     const scraper = new Scraper();
 

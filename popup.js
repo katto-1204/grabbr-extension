@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const exportCsvBtn = document.getElementById('export-csv-btn');
     const exportMdBtn = document.getElementById('export-md-btn');
     const clearResultsBtn = document.getElementById('clear-results-btn');
+    const popGhostBtn = document.getElementById('pop-ghost-btn');
 
     // Options
     const optDedup = document.getElementById('opt-dedup');
@@ -38,14 +39,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Initialization ---
 
-    // Preferences Persistence
-    const isTransparent = localStorage.getItem('grabbr_transparent') === 'true';
-    if (isTransparent && optTransparency) {
+    // Ghost Mode Detection
+    const urlParams = new URLSearchParams(window.location.search);
+    const isGhostMode = urlParams.get('ghost') === 'true';
+    if (isGhostMode) {
         document.body.classList.add('transparent-mode');
-        optTransparency.checked = true;
-    }
-    if (optAutoCopy) {
-        optAutoCopy.checked = localStorage.getItem('grabbr_autocopy') === 'true';
+        document.querySelectorAll('.ghost-hidden').forEach(el => el.style.display = 'none');
+        // Compact height for Ghost iframe
+        const app = document.getElementById('app');
+        if (app) app.style.height = '100vh';
     }
 
     // Auto-Theme Detection
@@ -130,6 +132,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 return textMatch || questionMatch || choicesMatch;
             });
             renderPreview(filtered);
+        });
+    }
+
+    if (popGhostBtn) {
+        popGhostBtn.addEventListener('click', async () => {
+            const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+            if (!tab || !tab.id) return;
+            await chrome.tabs.sendMessage(tab.id, { action: 'toggleGhostMode', enabled: true });
+            window.close(); // Close the popup window
         });
     }
 
